@@ -1,0 +1,58 @@
+[diff]
+	tool = vimdiff
+[merge]
+	tool=vimdiff
+[difftool]
+	prompt = false
+	trustExitCode = true
+[alias]
+    c = checkout 
+    s = status
+	d = difftool
+	m = mergetool
+	l = log --oneline --graph
+    lsm=!git log --oneline --graph -p --submodule --format='%h  [%ad]  %s  [by %an]%d' --decorate --date=iso |grep -E '^[*| /\\]+([a-z0-9]{7} |Submodule |> |< )'
+    frsm=  submodule foreach --recursive  
+    fsm=  submodule foreach 
+    diffsm=\
+        submodule foreach --recursive  \
+        'echo   "=============================================================================================" \
+        && pwd \
+        && echo "=============================================================================================" \
+        && (git l --decorate=short|head -n 5)\
+        && echo "=============================================================================================" \
+        && git diff '
+    ssm=\
+        submodule foreach --recursive  \
+        'echo   "=============================================================================================" \
+        && pwd \
+        && echo "=============================================================================================" \
+        && (git l --decorate=short|head -n 1)\
+        && echo "=============================================================================================" \
+        && git s '
+
+[mergetool]
+	trustExitCode = true
+[user]
+    name = huangbinbin
+	email = huangbinbin@deepvision-tech.com
+[cola]
+	blameviewer = git gui blame
+[gui]
+	editor = vim
+	historybrowser = gitk
+[commit]
+	template = C:/Users/user/.gitmessage
+#[credential "http://10.1.8.27"]
+#	provider = generic
+[credential "http://10.1.8.8"]
+	provider = generic
+[credential "http://git1.deepvision-tech.net"]
+	provider = generic
+[credential "http://git2.deepvision-tech.net"]
+	provider = generic
+[core]
+	ignorecase = false
+    iflemode = false
+    autocrlf=true
+

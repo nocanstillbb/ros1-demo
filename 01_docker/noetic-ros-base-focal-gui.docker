@@ -1,0 +1,71 @@
+FROM  ros:noetic-ros-base-focal
+#FROM --platform=linux/amd64 nvidia/cuda:12.6.1-cudnn-devel-ubuntu20.04 
+ENV DEBIAN_FRONTEND=noninteractive
+
+COPY .gitconfig /root/.gitconfig
+COPY .vimrc /root/.vimrc
+COPY .config /root/.config
+
+RUN  cat <<EOF > /etc/apt/sources.list
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse
+
+# 以下安全更新软件源包含了官方源与镜像站配置，如有需要可自行修改注释切换
+deb http://security.ubuntu.com/ubuntu/ focal-security main restricted universe multiverse
+# deb-src http://security.ubuntu.com/ubuntu/ focal-security main restricted universe multiverse
+
+# 预发布软件源，不建议启用
+# deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-proposed main restricted universe multiverse
+# # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-proposed main restricted universe multiverse
+EOF
+
+RUN \
+apt update && \
+apt install -y  \
+build-essential \
+software-properties-common &&\
+apt update && \
+apt install -y locales language-pack-zh-hans language-pack-gnome-zh-hans fonts-wqy-zenhei fonts-wqy-microhei ibus-rime librime-data-wubi && sed -i.bak 's/# zh_CN.UTF-8/zh_CN.UTF-8/g' /etc/locale.gen && locale-gen && update-locale LANG=zh_CN.UTF-8 && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+apt install -y \
+  autoconf \
+  automake \
+  bison \
+  build-essential \
+  cmake \
+  gcc \
+  g++ \
+  git \
+  lsb-release \
+  make \
+  ninja-build \
+  python3 \
+  rsync \
+  tar \
+  unzip \
+  vim \
+  wget \
+  curl \
+  file \
+  iproute2 \
+  iputils-ping \
+  ros-noetic-turtlesim  \
+  cowsay && \
+  apt install -y openssh-server && echo 'root:aaa' | chpasswd && sed -i.bak 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh/sshd_config && service ssh restart  && \
+  apt clean  && \
+  mkdir -p /opt/label-image
+
+RUN apt install -y gnome  && apt clean
+RUN echo 'source /opt/ros/noetic/setup.bash' >> /root/.bashrc
+RUN apt install -y terminator  && apt clean
+
+
+
+WORKDIR  /root
+ENTRYPOINT ["/bin/bash","-c" ,"service ssh start && tail -f /dev/null"]
+
+
